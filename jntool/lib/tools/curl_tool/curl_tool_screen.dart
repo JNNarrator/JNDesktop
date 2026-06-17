@@ -1,7 +1,6 @@
 // Curl 工具 —— 主界面
 // 输入 curl 命令 → 发送请求 → 展示响应（JSON 树形 / HTML 预览 / 纯文本 / Headers）
 
-
 import 'package:flutter/material.dart';
 import '../../utils/constants.dart';
 import '../../widgets/glass_container.dart';
@@ -178,12 +177,15 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
-        if (_response != null)
-          _buildStatusCodeBadge(_response!.statusCode),
+        if (_response != null) _buildStatusCodeBadge(_response!.statusCode),
         const Spacer(),
-        _ToolbarBtn(icon: Icons.auto_fix_high, label: 'GET 示例', onTap: _loadSample),
+        _ToolbarBtn(
+            icon: Icons.auto_fix_high, label: 'GET 示例', onTap: _loadSample),
         const SizedBox(width: AppSpacing.xs),
-        _ToolbarBtn(icon: Icons.auto_fix_high, label: 'POST 示例', onTap: _loadSamplePost),
+        _ToolbarBtn(
+            icon: Icons.auto_fix_high,
+            label: 'POST 示例',
+            onTap: _loadSamplePost),
         const SizedBox(width: AppSpacing.xs),
         _ToolbarBtn(icon: Icons.delete_outline, label: '清空', onTap: _clearAll),
         const SizedBox(width: AppSpacing.sm),
@@ -300,8 +302,11 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
                 const Spacer(),
                 if (_parsedRequest != null)
                   Text(
-                    '${_parsedRequest!.method} ${_parsedRequest!.url.length > 30 ? _parsedRequest!.url.substring(0, 30) + "..." : _parsedRequest!.url}',
-                    style: TextStyle(fontSize: 10, color: AppColors.textMuted, fontFamily: 'monospace'),
+                    '${_parsedRequest!.method} ${_parsedRequest!.url.length > 30 ? '${_parsedRequest!.url.substring(0, 30)}...' : _parsedRequest!.url}',
+                    style: TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textMuted,
+                        fontFamily: 'monospace'),
                   ),
               ],
             ),
@@ -320,7 +325,8 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
                   color: AppColors.textPrimary,
                 ),
                 decoration: const InputDecoration(
-                  hintText: '粘贴 curl 命令...\ne.g. curl \'https://api.example.com\' -H \'Header: value\'',
+                  hintText:
+                      '粘贴 curl 命令...\ne.g. curl \'https://api.example.com\' -H \'Header: value\'',
                   hintStyle: TextStyle(
                     color: AppColors.textMuted,
                     fontSize: 12,
@@ -372,8 +378,7 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
                 ),
               ],
               const Spacer(),
-              if (_response != null)
-                _buildTabBar(),
+              if (_response != null) _buildTabBar(),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -448,7 +453,9 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
           children: [
             const Text('⚠️', style: TextStyle(fontSize: 32)),
             const SizedBox(height: AppSpacing.sm),
-            Text(_parseError!, style: const TextStyle(fontSize: 13, color: AppColors.accentRose)),
+            Text(_parseError!,
+                style:
+                    const TextStyle(fontSize: 13, color: AppColors.accentRose)),
           ],
         ),
       );
@@ -466,7 +473,10 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Text(
                 _sendError!,
-                style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: AppColors.accentRose),
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                    color: AppColors.accentRose),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -485,11 +495,13 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
             const SizedBox(height: AppSpacing.md),
             const Text(
               '在左侧粘贴 curl 命令\n然后点击「发送」',
-              style: TextStyle(fontSize: 14, color: AppColors.textMuted, height: 1.5),
+              style: TextStyle(
+                  fontSize: 14, color: AppColors.textMuted, height: 1.5),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
-            const Text('试试示例请求吧 ✨', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+            const Text('试试示例请求吧 ✨',
+                style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
           ],
         ),
       );
@@ -511,7 +523,8 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
     // 空响应体
     if (_response!.textBody.isEmpty) {
       return const Center(
-        child: Text('响应体为空', style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
+        child: Text('响应体为空',
+            style: TextStyle(fontSize: 13, color: AppColors.textMuted)),
       );
     }
 
@@ -561,8 +574,10 @@ class _CurlToolScreenState extends State<CurlToolScreen> {
             child: const Text(
               'HTML',
               style: TextStyle(
-                fontSize: 10, fontWeight: FontWeight.w600,
-                color: Color(0xFFD97706), fontFamily: 'monospace',
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFD97706),
+                fontFamily: 'monospace',
               ),
             ),
           ),
@@ -661,7 +676,8 @@ class _ToolbarBtn extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppRadius.sm),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -669,7 +685,10 @@ class _ToolbarBtn extends StatelessWidget {
               const SizedBox(width: 3),
               Text(
                 label,
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -707,7 +726,9 @@ class _TabButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12, color: isActive ? AppColors.primaryStart : AppColors.textMuted),
+            Icon(icon,
+                size: 12,
+                color: isActive ? AppColors.primaryStart : AppColors.textMuted),
             const SizedBox(width: 3),
             Text(
               label,

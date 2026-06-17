@@ -1,47 +1,28 @@
 # JNTool
 
-JNTool is a macOS desktop development tool application built with Flutter, designed to provide developers with convenient code generation and data processing functionalities.
+JNTool is a Flutter-based desktop toolkit for everyday developer workflows such as API debugging, data formatting, and code generation. It currently targets Windows and macOS desktop apps, bringing small but frequently used utilities into one lightweight workspace.
 
 ## Features
 
-- **Bean Generator**: Quickly generate Java/Flutter Bean classes and configuration panels
-- **Curl Tool**: Parse curl commands and support HTTP request simulation and debugging
-- **JSON Tool**: Parse, format, and visually display JSON data in a tree structure
+- **JSON / Java Bean conversion**: Generate Java Bean code from JSON, or produce sample JSON from Java Bean fields. Supports class name, package name, Lombok annotations, Jackson annotations, camelCase conversion, and field comments.
+- **Curl tool**: Parse curl commands and extract URL, method, headers, and request body for API debugging.
+- **JSON tool**: Format, minify, and inspect JSON structures.
+- **Desktop experience**: Built with Flutter and includes Windows and macOS platform projects.
 
-## Technology Stack
+## Tech Stack
 
-- **Framework**: Flutter 3.x
-- **Platform**: macOS
-- **State Management**: Provider
-- **Programming Language**: Dart
-
-## Project Structure
-
-```
-jntool/
-├── lib/
-│   ├── app.dart              # Application entry
-│   ├── main.dart             # Main function
-│   ├── models/               # Data models
-│   ├── providers/            # State management
-│   ├── screens/              # Screen pages
-│   ├── tools/                # Tool modules
-│   │   ├── bean_tool/        # Bean generator tool
-│   │   ├── curl_tool/        # Curl parser tool
-│   │   └── json_tool/        # JSON processing tool
-│   ├── utils/                # Utility classes
-│   └── widgets/              # Common widgets
-├── macos/                    # macOS native configuration
-├── test/                     # Unit tests
-└── pubspec.yaml              # Dependency configuration
-```
+- Flutter 3.x
+- Dart
+- Provider
+- Windows Desktop / macOS Desktop
 
 ## Quick Start
 
-### Prerequisites
+### Requirements
 
-- Flutter SDK (>=3.0.0)
-- macOS 10.14+
+- Flutter SDK 3.0 or later
+- Windows: Visual Studio 2022 Build Tools with the **Desktop development with C++** workload
+- macOS: Xcode and the macOS desktop development toolchain
 
 ### Install Dependencies
 
@@ -50,42 +31,73 @@ cd jntool
 flutter pub get
 ```
 
-### Run the Project
+### Run the App
+
+Windows:
+
+```bash
+flutter run -d windows
+```
+
+macOS:
 
 ```bash
 flutter run -d macos
 ```
 
-### Build the Application
+### Build the App
+
+Windows:
+
+```bash
+flutter build windows
+```
+
+macOS:
 
 ```bash
 flutter build macos
 ```
 
-## Feature Details
+## Project Structure
 
-### Bean Generator
+```text
+jndesktop/
+├── jntool/
+│   ├── lib/
+│   │   ├── app.dart
+│   │   ├── main.dart
+│   │   ├── models/
+│   │   ├── providers/
+│   │   ├── screens/
+│   │   ├── tools/
+│   │   │   ├── bean_tool/
+│   │   │   ├── curl_tool/
+│   │   │   └── json_tool/
+│   │   ├── utils/
+│   │   └── widgets/
+│   ├── macos/
+│   ├── windows/
+│   ├── test/
+│   └── pubspec.yaml
+├── README.md
+└── README.en.md
+```
 
-Provides a visual configuration panel for Bean classes, supporting custom field types, annotations, and more, to generate standardized code templates.
+## Development Checks
 
-### Curl Tool
-
-- Parse curl command strings
-- Convert to HTTP request configurations
-- Support for multiple HTTP methods and request headers
-
-### JSON Tool
-
-- Format and compress JSON
-- Tree-structured visualization
-- Bidirectional conversion between JSON and Dart models
-
-## Contribution Guidelines
-
-Issues and pull requests are welcome. Please ensure tests are passed before submitting:
+Before submitting changes, run:
 
 ```bash
+cd jntool
+flutter analyze
 flutter test
+```
+
+To verify the Windows desktop build:
+
+```bash
+flutter build windows
 ```
 
 ## License

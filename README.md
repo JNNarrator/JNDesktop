@@ -1,47 +1,28 @@
 # JNTool
 
-JNTool 是一款基于 Flutter 构建的 macOS 桌面开发工具应用，旨在为开发者提供便捷的代码生成和数据处理功能。
+JNTool 是一款基于 Flutter 的桌面开发工具集，面向日常接口调试、数据整理和代码生成场景。项目目前支持 Windows 与 macOS 桌面端，核心体验是把常用的小工具集中在一个轻量应用里，减少开发过程中在网页、脚本和编辑器之间来回切换。
 
-## 功能特点
+## 功能特性
 
-- **Bean 生成器**：快速生成 Java/Flutter Bean 类及配置面板
-- **Curl 工具**：解析 curl 命令，支持 HTTP 请求模拟与调试
-- **JSON 工具**：JSON 数据解析、格式化和树形可视化展示
+- **JSON / Java Bean 转换**：支持 JSON 生成 Java Bean、Java Bean 生成示例 JSON，可配置类名、包名、Lombok 注解、Jackson 注解、驼峰命名和字段注释。
+- **Curl 工具**：解析 curl 命令，提取 URL、请求方法、请求头和请求体，辅助接口调试。
+- **JSON 工具**：提供 JSON 格式化、压缩和结构查看能力。
+- **桌面端体验**：使用 Flutter 构建，当前仓库已包含 Windows 与 macOS 平台工程。
 
 ## 技术栈
 
-- **框架**：Flutter 3.x
-- **平台**：macOS
-- **状态管理**：Provider
-- **编程语言**：Dart
-
-## 项目结构
-
-```
-jntool/
-├── lib/
-│   ├── app.dart              # 应用入口
-│   ├── main.dart             # 主函数
-│   ├── models/               # 数据模型
-│   ├── providers/           # 状态管理
-│   ├── screens/              # 页面屏幕
-│   ├── tools/                # 工具模块
-│   │   ├── bean_tool/        # Bean 生成工具
-│   │   ├── curl_tool/        # Curl 解析工具
-│   │   └── json_tool/        # JSON 处理工具
-│   ├── utils/                # 工具类
-│   └── widgets/              # 公共组件
-├── macos/                    # macOS 原生配置
-├── test/                     # 单元测试
-└── pubspec.yaml              # 依赖配置
-```
+- Flutter 3.x
+- Dart
+- Provider
+- Windows Desktop / macOS Desktop
 
 ## 快速开始
 
 ### 环境要求
 
-- Flutter SDK (>=3.0.0)
-- macOS 10.14+
+- Flutter SDK 3.0 或更高版本
+- Windows：Visual Studio 2022 Build Tools，并安装 **Desktop development with C++** 工作负载
+- macOS：Xcode 与 macOS 桌面开发环境
 
 ### 安装依赖
 
@@ -50,7 +31,15 @@ cd jntool
 flutter pub get
 ```
 
-### 运行项目
+### 运行应用
+
+Windows：
+
+```bash
+flutter run -d windows
+```
+
+macOS：
 
 ```bash
 flutter run -d macos
@@ -58,36 +47,59 @@ flutter run -d macos
 
 ### 构建应用
 
+Windows：
+
+```bash
+flutter build windows
+```
+
+macOS：
+
 ```bash
 flutter build macos
 ```
 
-## 功能说明
+## 项目结构
 
-### Bean 生成工具
+```text
+jndesktop/
+├── jntool/
+│   ├── lib/
+│   │   ├── app.dart
+│   │   ├── main.dart
+│   │   ├── models/
+│   │   ├── providers/
+│   │   ├── screens/
+│   │   ├── tools/
+│   │   │   ├── bean_tool/
+│   │   │   ├── curl_tool/
+│   │   │   └── json_tool/
+│   │   ├── utils/
+│   │   └── widgets/
+│   ├── macos/
+│   ├── windows/
+│   ├── test/
+│   └── pubspec.yaml
+├── README.md
+└── README.en.md
+```
 
-提供可视化的 Bean 类配置面板，支持自定义字段类型、注解等，生成标准化的代码模板。
+## 开发检查
 
-### Curl 工具
-
-- 解析 curl 命令字符串
-- 转换为 HTTP 请求配置
-- 支持多种 HTTP 方法和请求头设置
-
-### JSON 工具
-
-- JSON 格式化与压缩
-- 树形结构可视化
-- JSON 与 Dart Model 互转
-
-## 贡献指南
-
-欢迎提交 Issue 和 Pull Request。请确保提交前运行测试：
+提交前建议执行：
 
 ```bash
+cd jntool
+flutter analyze
 flutter test
 ```
 
-## 许可证
+如需验证 Windows 桌面构建：
 
-本项目基于 MIT 许可证开源。
+```bash
+flutter build windows
+```
+
+## 许可
+
+本项目使用 MIT License 开源。

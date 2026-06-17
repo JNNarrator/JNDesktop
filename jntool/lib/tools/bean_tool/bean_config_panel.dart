@@ -1,11 +1,10 @@
-// Bean 工具 —— 配置面板
-// Lombok 选项、类名、内部类等配置
+// Bean tool configuration panel.
 
 import 'package:flutter/material.dart';
+
 import '../../utils/constants.dart';
 import 'bean_generator.dart';
 
-/// 配置面板回调
 typedef OnConfigChanged = void Function(BeanConvertConfig config);
 
 class BeanConfigPanel extends StatefulWidget {
@@ -26,11 +25,26 @@ class _BeanConfigPanelState extends State<BeanConfigPanel> {
   late TextEditingController _classNameCtrl;
   late TextEditingController _packageCtrl;
 
+  BeanConvertConfig get _base => widget.config;
+
   @override
   void initState() {
     super.initState();
     _classNameCtrl = TextEditingController(text: widget.config.className);
     _packageCtrl = TextEditingController(text: widget.config.packageName);
+  }
+
+  @override
+  void didUpdateWidget(covariant BeanConfigPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.config.className != widget.config.className &&
+        _classNameCtrl.text != widget.config.className) {
+      _classNameCtrl.text = widget.config.className;
+    }
+    if (oldWidget.config.packageName != widget.config.packageName &&
+        _packageCtrl.text != widget.config.packageName) {
+      _packageCtrl.text = widget.config.packageName;
+    }
   }
 
   @override
@@ -44,174 +58,448 @@ class _BeanConfigPanelState extends State<BeanConfigPanel> {
     widget.onChanged(updated);
   }
 
-  BeanConvertConfig _base() => widget.config;
+  BeanConvertConfig _copyConfig({
+    LombokConfig? lombok,
+    String? className,
+    bool? useInnerClass,
+    String? packageName,
+    bool? useJsonAnnotations,
+    bool? useCamelCase,
+    bool? generateComments,
+  }) {
+    return BeanConvertConfig(
+      lombok: lombok ?? _base.lombok,
+      className: className ?? _base.className,
+      useInnerClass: useInnerClass ?? _base.useInnerClass,
+      packageName: packageName ?? _base.packageName,
+      useJsonAnnotations: useJsonAnnotations ?? _base.useJsonAnnotations,
+      useCamelCase: useCamelCase ?? _base.useCamelCase,
+      generateComments: generateComments ?? _base.generateComments,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: AppColors.glassWhite,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: AppColors.glassBorder, width: 0.8),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.borderLight),
+        boxShadow: AppShadows.soft,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              const Text('⚙️ 转换配置',
-                style: TextStyle(fontSize: AppTypography.h3Size, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-              const SizedBox(height: AppSpacing.md),
-
-              // 类名
-              _section('类名', child: TextField(
-                controller: _classNameCtrl,
-                onChanged: (v) => _emit(BeanConvertConfig(
-                  lombok: _base().lombok, className: v.isNotEmpty ? v : 'Root',
-                  useInnerClass: _base().useInnerClass, packageName: _base().packageName,
-                  useJsonAnnotations: _base().useJsonAnnotations,
-                  useCamelCase: _base().useCamelCase, generateComments: _base().generateComments,
-                )),
-                style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
-                decoration: const InputDecoration(
-                  hintText: 'ClassName',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), isDense: true,
-                  filled: true, fillColor: Color(0xFFF1F5F9),
+              const Expanded(
+                child: Text(
+                  '转换配置',
+                  style: TextStyle(
+                    fontSize: AppTypography.h3Size,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-              )),
-              const SizedBox(height: AppSpacing.sm),
-
-              // 包名
-              _section('包名', child: TextField(
-                controller: _packageCtrl,
-                onChanged: (v) => _emit(BeanConvertConfig(
-                  lombok: _base().lombok, className: _base().className,
-                  useInnerClass: _base().useInnerClass, packageName: v,
-                  useJsonAnnotations: _base().useJsonAnnotations,
-                  useCamelCase: _base().useCamelCase, generateComments: _base().generateComments,
-                )),
-                style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
-                decoration: const InputDecoration(
-                  hintText: 'com.example.model',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), isDense: true,
-                  filled: true, fillColor: Color(0xFFF1F5F9),
-                ),
-              )),
-              const SizedBox(height: AppSpacing.sm),
-
-              // 开关
-              _switchRow('使用内部类', _base().useInnerClass, (v) => _emit(BeanConvertConfig(
-                lombok: _base().lombok, className: _base().className,
-                useInnerClass: v, packageName: _base().packageName,
-                useJsonAnnotations: _base().useJsonAnnotations,
-                useCamelCase: _base().useCamelCase, generateComments: _base().generateComments,
-              ))),
-              _switchRow('驼峰命名', _base().useCamelCase, (v) => _emit(BeanConvertConfig(
-                lombok: _base().lombok, className: _base().className,
-                useInnerClass: _base().useInnerClass, packageName: _base().packageName,
-                useJsonAnnotations: _base().useJsonAnnotations,
-                useCamelCase: v, generateComments: _base().generateComments,
-              ))),
-              _switchRow('生成注释', _base().generateComments, (v) => _emit(BeanConvertConfig(
-                lombok: _base().lombok, className: _base().className,
-                useInnerClass: _base().useInnerClass, packageName: _base().packageName,
-                useJsonAnnotations: _base().useJsonAnnotations,
-                useCamelCase: _base().useCamelCase, generateComments: v,
-              ))),
-              _switchRow('Jackson 注解', _base().useJsonAnnotations, (v) => _emit(BeanConvertConfig(
-                lombok: _base().lombok, className: _base().className,
-                useInnerClass: _base().useInnerClass, packageName: _base().packageName,
-                useJsonAnnotations: v, useCamelCase: _base().useCamelCase,
-                generateComments: _base().generateComments,
-              ))),
-              const SizedBox(height: AppSpacing.md),
-
-              // Lombok 注解
-              const Text('📦 Lombok 注解',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-              const SizedBox(height: AppSpacing.sm),
-              ..._buildLombokToggles(),
+              ),
+              _MiniBadge(label: '${_enabledLombokCount()} Lombok'),
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.sm),
+          Expanded(
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(right: AppSpacing.sm),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _ConfigSection(
+                      title: '基础配置',
+                      child: Column(
+                        children: [
+                          _FieldInput(
+                            label: '类名',
+                            controller: _classNameCtrl,
+                            hintText: 'Root',
+                            onChanged: (value) => _emit(
+                              _copyConfig(
+                                className: value.trim().isEmpty
+                                    ? 'Root'
+                                    : value.trim(),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          _FieldInput(
+                            label: '包名',
+                            controller: _packageCtrl,
+                            hintText: 'com.example.model',
+                            onChanged: (value) => _emit(
+                              _copyConfig(packageName: value.trim()),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    _ConfigSection(
+                      title: '字段规则',
+                      child: Column(
+                        children: [
+                          _SwitchTile(
+                            label: '使用内部类',
+                            value: _base.useInnerClass,
+                            onChanged: (value) => _emit(
+                              _copyConfig(useInnerClass: value),
+                            ),
+                          ),
+                          _SwitchTile(
+                            label: '驼峰命名',
+                            value: _base.useCamelCase,
+                            onChanged: (value) => _emit(
+                              _copyConfig(useCamelCase: value),
+                            ),
+                          ),
+                          _SwitchTile(
+                            label: '生成注释',
+                            value: _base.generateComments,
+                            onChanged: (value) => _emit(
+                              _copyConfig(generateComments: value),
+                            ),
+                          ),
+                          _SwitchTile(
+                            label: 'Jackson 注解',
+                            value: _base.useJsonAnnotations,
+                            onChanged: (value) => _emit(
+                              _copyConfig(
+                                useJsonAnnotations: value,
+                                lombok: _copyLombok(
+                                  useJsonProperty: value,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    _ConfigSection(
+                      title: 'Lombok 注解',
+                      child: Wrap(
+                        spacing: AppSpacing.sm,
+                        runSpacing: AppSpacing.sm,
+                        children: _buildLombokToggles(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  int _enabledLombokCount() {
+    final lb = _base.lombok;
+    return [
+      lb.useData,
+      lb.useBuilder,
+      lb.useAllArgs,
+      lb.useNoArgs,
+      lb.useAccessors,
+      lb.useToString,
+      lb.useEqualsHash,
+    ].where((value) => value).length;
   }
 
   List<Widget> _buildLombokToggles() {
-    final lb = _base().lombok;
+    final lb = _base.lombok;
     return [
-      _lombokRow('@Data', lb.useData, (v) => _updateLombok(lb, useData: v)),
-      _lombokRow('@Builder', lb.useBuilder, (v) => _updateLombok(lb, useBuilder: v)),
-      _lombokRow('@AllArgsConstructor', lb.useAllArgs, (v) => _updateLombok(lb, useAllArgs: v)),
-      _lombokRow('@NoArgsConstructor', lb.useNoArgs, (v) => _updateLombok(lb, useNoArgs: v)),
-      _lombokRow('@Accessors(chain=true)', lb.useAccessors, (v) => _updateLombok(lb, useAccessors: v)),
-      _lombokRow('@ToString', lb.useToString, (v) => _updateLombok(lb, useToString: v)),
-      _lombokRow('@EqualsAndHashCode', lb.useEqualsHash, (v) => _updateLombok(lb, useEqualsHash: v)),
+      _LombokChip(
+        label: '@Data',
+        value: lb.useData,
+        onChanged: (value) => _updateLombok(useData: value),
+      ),
+      _LombokChip(
+        label: '@Builder',
+        value: lb.useBuilder,
+        onChanged: (value) => _updateLombok(useBuilder: value),
+      ),
+      _LombokChip(
+        label: '@AllArgsConstructor',
+        value: lb.useAllArgs,
+        onChanged: (value) => _updateLombok(useAllArgs: value),
+      ),
+      _LombokChip(
+        label: '@NoArgsConstructor',
+        value: lb.useNoArgs,
+        onChanged: (value) => _updateLombok(useNoArgs: value),
+      ),
+      _LombokChip(
+        label: '@Accessors(chain=true)',
+        value: lb.useAccessors,
+        onChanged: (value) => _updateLombok(useAccessors: value),
+      ),
+      _LombokChip(
+        label: '@ToString',
+        value: lb.useToString,
+        onChanged: (value) => _updateLombok(useToString: value),
+      ),
+      _LombokChip(
+        label: '@EqualsAndHashCode',
+        value: lb.useEqualsHash,
+        onChanged: (value) => _updateLombok(useEqualsHash: value),
+      ),
     ];
   }
 
-  void _updateLombok(LombokConfig lb, {bool? useData, bool? useBuilder, bool? useAllArgs, bool? useNoArgs, bool? useAccessors, bool? useToString, bool? useEqualsHash}) {
-    _emit(BeanConvertConfig(
-      lombok: LombokConfig(
-        useData: useData ?? lb.useData,
-        useBuilder: useBuilder ?? lb.useBuilder,
-        useAllArgs: useAllArgs ?? lb.useAllArgs,
-        useNoArgs: useNoArgs ?? lb.useNoArgs,
-        useAccessors: useAccessors ?? lb.useAccessors,
-        useToString: useToString ?? lb.useToString,
-        useEqualsHash: useEqualsHash ?? lb.useEqualsHash,
-      ),
-      className: _base().className, useInnerClass: _base().useInnerClass,
-      packageName: _base().packageName, useJsonAnnotations: _base().useJsonAnnotations,
-      useCamelCase: _base().useCamelCase, generateComments: _base().generateComments,
-    ));
+  LombokConfig _copyLombok({
+    bool? useData,
+    bool? useBuilder,
+    bool? useAllArgs,
+    bool? useNoArgs,
+    bool? useAccessors,
+    bool? useToString,
+    bool? useEqualsHash,
+    bool? useJsonProperty,
+  }) {
+    final lb = _base.lombok;
+    return LombokConfig(
+      useData: useData ?? lb.useData,
+      useGetter: lb.useGetter,
+      useSetter: lb.useSetter,
+      useToString: useToString ?? lb.useToString,
+      useEqualsHash: useEqualsHash ?? lb.useEqualsHash,
+      useBuilder: useBuilder ?? lb.useBuilder,
+      useAllArgs: useAllArgs ?? lb.useAllArgs,
+      useNoArgs: useNoArgs ?? lb.useNoArgs,
+      useAccessors: useAccessors ?? lb.useAccessors,
+      useJsonIgnore: lb.useJsonIgnore,
+      useJsonProperty: useJsonProperty ?? lb.useJsonProperty,
+    );
   }
 
-  Widget _section(String title, {required Widget child}) {
+  void _updateLombok({
+    bool? useData,
+    bool? useBuilder,
+    bool? useAllArgs,
+    bool? useNoArgs,
+    bool? useAccessors,
+    bool? useToString,
+    bool? useEqualsHash,
+  }) {
+    _emit(
+      _copyConfig(
+        lombok: _copyLombok(
+          useData: useData,
+          useBuilder: useBuilder,
+          useAllArgs: useAllArgs,
+          useNoArgs: useNoArgs,
+          useAccessors: useAccessors,
+          useToString: useToString,
+          useEqualsHash: useEqualsHash,
+        ),
+      ),
+    );
+  }
+}
+
+class _ConfigSection extends StatelessWidget {
+  final String title;
+  final Widget child;
+
+  const _ConfigSection({required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _FieldInput extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final String hintText;
+  final ValueChanged<String> onChanged;
+
+  const _FieldInput({
+    required this.label,
+    required this.controller,
+    required this.hintText,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondary,
+          ),
+        ),
         const SizedBox(height: AppSpacing.xs),
-        child,
+        TextField(
+          controller: controller,
+          onChanged: onChanged,
+          style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(color: AppColors.textMuted),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.xs),
+              borderSide: const BorderSide(color: AppColors.borderLight),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.xs),
+              borderSide: const BorderSide(color: AppColors.borderLight),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.xs),
+              borderSide: const BorderSide(color: AppColors.primaryStart),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.sm,
+            ),
+            isDense: true,
+            filled: true,
+            fillColor: Colors.white,
+          ),
+        ),
       ],
     );
   }
+}
 
-  Widget _switchRow(String label, bool value, ValueChanged<bool> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-      child: Row(
-        children: [
-          Switch(value: value, onChanged: onChanged, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap),
-          const SizedBox(width: AppSpacing.sm),
-          Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary)),
-        ],
+class _SwitchTile extends StatelessWidget {
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _SwitchTile({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => onChanged(!value),
+      borderRadius: BorderRadius.circular(AppRadius.xs),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+            Switch(
+              value: value,
+              onChanged: onChanged,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ],
+        ),
       ),
     );
   }
+}
 
-  Widget _lombokRow(String label, bool value, ValueChanged<bool> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 20, height: 20,
-            child: Checkbox(value: value, onChanged: (v) => onChanged(v == true), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Text(label, style: TextStyle(
-            fontSize: 12, fontFamily: 'monospace',
-            color: value ? AppColors.primaryStart : AppColors.textSecondary,
-            fontWeight: value ? FontWeight.w600 : FontWeight.normal,
-          )),
-        ],
+class _LombokChip extends StatelessWidget {
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _LombokChip({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterChip(
+      selected: value,
+      label: Text(label),
+      onSelected: onChanged,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+      showCheckmark: false,
+      labelStyle: TextStyle(
+        fontSize: 11,
+        fontFamily: 'monospace',
+        fontWeight: value ? FontWeight.w700 : FontWeight.w500,
+        color: value ? AppColors.primaryStart : AppColors.textSecondary,
+      ),
+      selectedColor: const Color(0xFFEFF6FF),
+      backgroundColor: Colors.white,
+      side: BorderSide(
+        color: value ? const Color(0xFFBFDBFE) : AppColors.borderLight,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.xs),
+      ),
+    );
+  }
+}
+
+class _MiniBadge extends StatelessWidget {
+  final String label;
+
+  const _MiniBadge({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding:
+          const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(AppRadius.xs),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Text(
+        label,
+        style: CodeStyle.badgeText.copyWith(color: AppColors.textSecondary),
       ),
     );
   }

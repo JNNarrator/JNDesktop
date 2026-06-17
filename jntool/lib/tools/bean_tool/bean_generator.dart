@@ -1,27 +1,25 @@
-// Bean 工具 —— Java Bean ↔ JSON 转换引擎
-// JSON 转 Java（支持 Lombok、自定义类名、内部类）、Java 转 JSON
+// Bean conversion engine.
+// Supports JSON -> Java Bean and Java Bean -> JSON sample generation.
 
 import 'dart:convert';
 
-/// 转换方向
 enum ConvertDirection {
-  jsonToBean, // JSON → Java Bean
-  beanToJson, // Java Bean → JSON
+  jsonToBean,
+  beanToJson,
 }
 
-/// Lombok 注解配置
 class LombokConfig {
-  final bool useData;       // @Data
-  final bool useGetter;     // @Getter
-  final bool useSetter;     // @Setter
-  final bool useToString;   // @ToString
-  final bool useEqualsHash; // @EqualsAndHashCode
-  final bool useBuilder;    // @Builder
-  final bool useAllArgs;    // @AllArgsConstructor
-  final bool useNoArgs;     // @NoArgsConstructor
-  final bool useAccessors;  // @Accessors(chain = true)
-  final bool useJsonIgnore; // @JsonIgnore（用于忽略字段）
-  final bool useJsonProperty; // @JsonProperty（用于指定 JSON 键名）
+  final bool useData;
+  final bool useGetter;
+  final bool useSetter;
+  final bool useToString;
+  final bool useEqualsHash;
+  final bool useBuilder;
+  final bool useAllArgs;
+  final bool useNoArgs;
+  final bool useAccessors;
+  final bool useJsonIgnore;
+  final bool useJsonProperty;
 
   const LombokConfig({
     this.useData = true,
@@ -37,13 +35,15 @@ class LombokConfig {
     this.useJsonProperty = false,
   });
 
-  /// 获取需要的 Lombok import
   List<String> get imports {
-    final result = <String>['import lombok.Data;'];
-    if (useGetter) result.add('import lombok.Getter;');
-    if (useSetter) result.add('import lombok.Setter;');
-    if (useToString) result.add('import lombok.ToString;');
-    if (useEqualsHash) result.add('import lombok.EqualsAndHashCode;');
+    final result = <String>[];
+    if (useData) result.add('import lombok.Data;');
+    if (useGetter && !useData) result.add('import lombok.Getter;');
+    if (useSetter && !useData) result.add('import lombok.Setter;');
+    if (useToString && !useData) result.add('import lombok.ToString;');
+    if (useEqualsHash && !useData) {
+      result.add('import lombok.EqualsAndHashCode;');
+    }
     if (useBuilder) result.add('import lombok.Builder;');
     if (useAllArgs) result.add('import lombok.AllArgsConstructor;');
     if (useNoArgs) result.add('import lombok.NoArgsConstructor;');
@@ -51,10 +51,10 @@ class LombokConfig {
     if (useJsonProperty || useJsonIgnore) {
       result.add('import com.fasterxml.jackson.annotation.*;');
     }
+    result.sort();
     return result;
   }
 
-  /// 获取类注解
   List<String> get classAnnotations {
     final result = <String>[];
     if (useData) result.add('@Data');
@@ -69,8 +69,10 @@ class LombokConfig {
     return result;
   }
 
-  /// 获取字段注解（根据字段是否需要特殊处理）
-  String fieldAnnotations(String fieldName, {bool isJsonIgnore = false, String? jsonPropertyName}) {
+  String fieldAnnotations({
+    bool isJsonIgnore = false,
+    String? jsonPropertyName,
+  }) {
     final result = <String>[];
     if (isJsonIgnore && useJsonIgnore) result.add('    @JsonIgnore');
     if (jsonPropertyName != null && useJsonProperty) {
@@ -80,15 +82,14 @@ class LombokConfig {
   }
 }
 
-/// Java 字段信息
 class JavaField {
   final String type;
   final String name;
-  final String? jsonName;      // JSON 中的键名（驼峰/下划线转换时有用）
-  final bool isObject;         // 是否为复杂对象
-  final bool isArray;          // 是否为数组/List
-  final String? elementType;   // 数组元素类型
-  final dynamic sampleValue;   // 示例值（用于推断类型）
+  final String? jsonName;
+  final bool isObject;
+  final bool isArray;
+  final String? elementType;
+  final dynamic sampleValue;
 
   JavaField({
     required this.type,
@@ -100,21 +101,18 @@ class JavaField {
     this.sampleValue,
   });
 
-  /// 首字母大写
-  String get capitalizedName => name.isNotEmpty
-      ? '${name[0].toUpperCase()}${name.substring(1)}'
-      : name;
+  String get capitalizedName =>
+      name.isNotEmpty ? '${name[0].toUpperCase()}${name.substring(1)}' : name;
 }
 
-/// 转换配置
 class BeanConvertConfig {
   final LombokConfig lombok;
   final String className;
   final bool useInnerClass;
   final String packageName;
-  final bool useJsonAnnotations; // Jackson 注解
-  final bool useCamelCase;       // 驼峰命名
-  final bool generateComments;   // 生成注释
+  final bool useJsonAnnotations;
+  final bool useCamelCase;
+  final bool generateComments;
 
   const BeanConvertConfig({
     this.lombok = const LombokConfig(),
@@ -127,27 +125,21 @@ class BeanConvertConfig {
   });
 }
 
-/// Bean 转换引擎
 class BeanGenerator {
-  /// JSON → Java Bean
   static String jsonToJava(String jsonStr, BeanConvertConfig config) {
     final trimmed = jsonStr.trim();
     if (trimmed.isEmpty) return '';
 
     try {
       final parsed = json.decode(trimmed);
-      final fields = _extractFields(parsed, '', config.useCamelCase);
-      final innerClasses = <String>[];
-
-      return _buildJavaClass(config, fields, parsed, innerClasses);
+      final fields = _extractFields(parsed, config.useCamelCase);
+      return _buildJavaClass(config, fields);
     } catch (e) {
-      return '// JSON 解析错误: $e\n${jsonStr}';
+      return '// JSON parse error: $e\n$jsonStr';
     }
   }
 
-  /// Java Bean → JSON
   static String javaToJson(String javaCode) {
-    // 从 Java 类定义解析出字段，生成示例 JSON
     try {
       final fields = _parseJavaFields(javaCode);
       final map = <String, dynamic>{};
@@ -157,23 +149,20 @@ class BeanGenerator {
       const encoder = JsonEncoder.withIndent('  ');
       return encoder.convert(map);
     } catch (e) {
-      return '// 解析失败: $e\n$javaCode';
+      return '// Java parse error: $e\n$javaCode';
     }
   }
 
-  /// 从 JSON 值提取字段列表（递归）
-  static List<JavaField> _extractFields(dynamic value, String prefix, bool useCamelCase) {
+  static List<JavaField> _extractFields(dynamic value, bool useCamelCase) {
     final fields = <JavaField>[];
 
     if (value is Map) {
       for (final entry in value.entries) {
         final key = entry.key.toString();
-        // 转换为驼峰命名（去掉下划线）
         final fieldName = useCamelCase ? _toCamelCase(key) : key;
         final fieldValue = entry.value;
 
         if (fieldValue is Map) {
-          // 对象类型
           fields.add(JavaField(
             type: _toClassName(key),
             name: fieldName,
@@ -182,7 +171,6 @@ class BeanGenerator {
             sampleValue: fieldValue,
           ));
         } else if (fieldValue is List) {
-          // 数组类型
           final elementType = _inferListElementType(fieldValue, key);
           fields.add(JavaField(
             type: 'List<$elementType>',
@@ -193,7 +181,6 @@ class BeanGenerator {
             sampleValue: fieldValue,
           ));
         } else {
-          // 基本类型
           fields.add(JavaField(
             type: _dartToJavaType(fieldValue),
             name: fieldName,
@@ -207,131 +194,157 @@ class BeanGenerator {
     return fields;
   }
 
-  /// 推断数组元素类型
   static String _inferListElementType(List list, String fieldName) {
     if (list.isEmpty) return 'Object';
     final first = list.first;
-    if (first is Map) return _toClassName(fieldName); // 去掉可能的复数
+    if (first is Map) return _toClassName(fieldName);
     if (first is List) return 'List<Object>';
     return _dartToJavaType(first);
   }
 
-  /// 构建 Java 类代码
   static String _buildJavaClass(
     BeanConvertConfig config,
-    List<JavaField> fields,
-    dynamic rawValue,
-    List<String> innerClasses,
-    {String className = ''}) {
-
+    List<JavaField> fields, {
+    String className = '',
+  }) {
     final actualClassName = className.isNotEmpty ? className : config.className;
     final buf = StringBuffer();
+    final lombok = _lombokWithJackson(config);
+    final imports = <String>{...lombok.imports};
 
-    // Package
+    if (fields.any((field) => field.isArray)) {
+      imports.add('import java.util.List;');
+    }
+
     if (config.packageName.isNotEmpty) {
       buf.writeln('package ${config.packageName};');
       buf.writeln();
     }
 
-    // Imports
-    if (config.lombok.imports.isNotEmpty) {
-      for (final imp in config.lombok.imports) {
-        buf.writeln(imp);
-      }
+    for (final imp in imports.toList()..sort()) {
+      buf.writeln(imp);
     }
-    // 检查是否需要 List/Map 的 import
-    final hasList = fields.any((f) => f.isArray);
-    if (hasList) {
-      buf.writeln('import java.util.List;');
-    }
+    if (imports.isNotEmpty) buf.writeln();
 
-    if (config.lombok.imports.isNotEmpty || hasList) {
-      buf.writeln();
-    }
-
-    // 类注释
     if (config.generateComments) {
       buf.writeln('/**');
-      buf.writeln(' * $actualClassName');
-      buf.writeln(' * Auto-generated by JNTool');
+      buf.writeln(' * $actualClassName model.');
+      buf.writeln(' *');
+      buf.writeln(' * Generated by JNTool.');
       buf.writeln(' */');
     }
 
-    // 类注解
-    for (final ann in config.lombok.classAnnotations) {
-      buf.writeln(ann);
+    for (final annotation in lombok.classAnnotations) {
+      buf.writeln(annotation);
     }
 
-    // 类定义
     buf.writeln('public class $actualClassName {');
-    buf.writeln();
+    if (fields.isNotEmpty) buf.writeln();
 
-    // 字段
-    for (final field in fields) {
-      // 字段注释
-      if (config.generateComments && field.jsonName != null && field.jsonName != field.name) {
-        buf.writeln('    /** JSON field: "${field.jsonName}" */');
+    for (var index = 0; index < fields.length; index++) {
+      final field = fields[index];
+      final jsonPropertyName =
+          field.jsonName != field.name ? field.jsonName : null;
+
+      if (config.generateComments && jsonPropertyName != null) {
+        buf.writeln('    /** JSON field: "$jsonPropertyName". */');
       }
 
-      // 字段注解
-      final fieldAnn = config.lombok.fieldAnnotations(
-        field.name,
-        jsonPropertyName: field.jsonName != field.name ? field.jsonName : null,
+      final fieldAnnotations = lombok.fieldAnnotations(
+        jsonPropertyName: jsonPropertyName,
       );
-      if (fieldAnn.isNotEmpty) {
-        buf.writeln(fieldAnn);
+      if (fieldAnnotations.isNotEmpty) {
+        buf.writeln(fieldAnnotations);
       }
 
       buf.writeln('    private ${field.type} ${field.name};');
-      buf.writeln();
+      if (index != fields.length - 1) buf.writeln();
     }
 
-    // 无 Lombok 时生成 getter/setter
+    if (_shouldGenerateAccessors(config, fields)) buf.writeln();
+
     if (!config.lombok.useData && !config.lombok.useGetter) {
-      for (final field in fields) {
-        buf.writeln('    public ${field.type} get${field.capitalizedName}() {');
-        buf.writeln('        return ${field.name};');
-        buf.writeln('    }');
-        buf.writeln();
-      }
+      _writeGetters(buf, fields);
     }
     if (!config.lombok.useData && !config.lombok.useSetter) {
-      for (final field in fields) {
-        buf.writeln('    public void set${field.capitalizedName}(${field.type} ${field.name}) {');
-        buf.writeln('        this.${field.name} = ${field.name};');
-        buf.writeln('    }');
-        buf.writeln();
-      }
+      if (!config.lombok.useGetter && fields.isNotEmpty) buf.writeln();
+      _writeSetters(buf, fields);
     }
 
     buf.writeln('}');
-
     return buf.toString();
   }
 
-  /// 将下划线命名转为驼峰
+  static LombokConfig _lombokWithJackson(BeanConvertConfig config) {
+    final lb = config.lombok;
+    return LombokConfig(
+      useData: lb.useData,
+      useGetter: lb.useGetter,
+      useSetter: lb.useSetter,
+      useToString: lb.useToString,
+      useEqualsHash: lb.useEqualsHash,
+      useBuilder: lb.useBuilder,
+      useAllArgs: lb.useAllArgs,
+      useNoArgs: lb.useNoArgs,
+      useAccessors: lb.useAccessors,
+      useJsonIgnore: lb.useJsonIgnore,
+      useJsonProperty: config.useJsonAnnotations || lb.useJsonProperty,
+    );
+  }
+
+  static bool _shouldGenerateAccessors(
+    BeanConvertConfig config,
+    List<JavaField> fields,
+  ) {
+    if (fields.isEmpty) return false;
+    return !config.lombok.useData &&
+        (!config.lombok.useGetter || !config.lombok.useSetter);
+  }
+
+  static void _writeGetters(StringBuffer buf, List<JavaField> fields) {
+    for (var index = 0; index < fields.length; index++) {
+      final field = fields[index];
+      buf.writeln('    public ${field.type} get${field.capitalizedName}() {');
+      buf.writeln('        return ${field.name};');
+      buf.writeln('    }');
+      if (index != fields.length - 1) buf.writeln();
+    }
+  }
+
+  static void _writeSetters(StringBuffer buf, List<JavaField> fields) {
+    for (var index = 0; index < fields.length; index++) {
+      final field = fields[index];
+      buf.writeln(
+        '    public void set${field.capitalizedName}(${field.type} ${field.name}) {',
+      );
+      buf.writeln('        this.${field.name} = ${field.name};');
+      buf.writeln('    }');
+      if (index != fields.length - 1) buf.writeln();
+    }
+  }
+
   static String _toCamelCase(String name) {
     final parts = name.split('_');
     if (parts.length == 1) return name;
-    return parts[0] + parts.skip(1).map((p) =>
-        p.isNotEmpty ? '${p[0].toUpperCase()}${p.substring(1)}' : '').join();
+    return parts[0] +
+        parts.skip(1).map((part) {
+          return part.isNotEmpty
+              ? '${part[0].toUpperCase()}${part.substring(1)}'
+              : '';
+        }).join();
   }
 
-  /// 将 JSON 键名转为类名（首字母大写驼峰）
   static String _toClassName(String name) {
-    // 去掉复数 s/es
     var base = _toCamelCase(name);
     if (base.endsWith('s') && base.length > 2) {
-      // 简单处理：去掉末尾 s
       base = base.substring(0, base.length - 1);
     }
-    if (base.endsWith('ss')) base = '${base}s'; // class 等
+    if (base.endsWith('ss')) base = '${base}s';
     return base.isNotEmpty
         ? '${base[0].toUpperCase()}${base.substring(1)}'
         : 'Item';
   }
 
-  /// Dart 类型 → Java 类型映射
   static String _dartToJavaType(dynamic value) {
     if (value == null) return 'Object';
     if (value is int) return 'Integer';
@@ -341,10 +354,8 @@ class BeanGenerator {
     return 'Object';
   }
 
-  /// 从 Java 代码解析字段
   static List<JavaField> _parseJavaFields(String javaCode) {
     final fields = <JavaField>[];
-    // 简单正则匹配字段定义：private Type name;
     final pattern = RegExp(
       r'private\s+(String|Integer|int|Long|long|Double|double|Boolean|boolean|List<[^>]+>|Map<[^>]+>|Object)\s+(\w+)\s*;',
     );
@@ -357,7 +368,6 @@ class BeanGenerator {
     return fields;
   }
 
-  /// Java 类型 → 示例值
   static dynamic _exampleValue(String type) {
     if (type == 'String' || type == 'string') return 'example';
     if (type == 'Integer' || type == 'int') return 0;
