@@ -29,13 +29,13 @@ jobs:
         run: flutter config --enable-windows-desktop
 
       - name: Install Inno Setup
-        shell: powershell
+        shell: pwsh
         run: |
           # 核心依赖：Inno Setup 负责把 Flutter Release 目录编译成 Windows 安装包。
           choco install innosetup --yes --no-progress
 
       - name: Build installer
-        shell: powershell
+        shell: pwsh
         working-directory: jntool
         run: |
           $ErrorActionPreference = "Stop"
@@ -50,7 +50,7 @@ jobs:
           # CI 使用 stable 通道重新解析依赖，避免本地 master 锁文件约束阻塞云端构建。
           Remove-Item pubspec.lock -ErrorAction SilentlyContinue
           # 核心流程：复用仓库内脚本，确保本地 Windows 与 CI 的打包逻辑一致。
-          powershell -NoProfile -ExecutionPolicy Bypass -File .\installer\windows\build_windows_installer.ps1
+          pwsh -NoProfile -File .\installer\windows\build_windows_installer.ps1
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
