@@ -55,8 +55,7 @@ class Sidebar extends StatelessWidget {
                     itemCount: provider.tools.length,
                     itemBuilder: (context, index) {
                       final tool = provider.tools[index];
-                      final isSelected =
-                          provider.currentTool?.id == tool.id;
+                      final isSelected = provider.currentTool?.id == tool.id;
                       return _SidebarItem(
                         tool: tool,
                         isSelected: isSelected,
@@ -64,7 +63,6 @@ class Sidebar extends StatelessWidget {
                     },
                   ),
                 ),
-              const Spacer(),
               // ---------- 底部版本 ----------
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -94,7 +92,10 @@ class _AppHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.sm,
       ),
       child: Row(
         children: [
@@ -217,9 +218,7 @@ class _SidebarItem extends StatelessWidget {
           vertical: AppSpacing.sm,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.glassWhite
-              : Colors.transparent,
+          color: isSelected ? AppColors.glassWhite : Colors.transparent,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: isSelected
               ? Border.all(

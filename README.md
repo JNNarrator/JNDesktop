@@ -53,6 +53,17 @@ Windows：
 flutter build windows
 ```
 
+生成 Windows 安装包需在 Windows 主机执行，并安装 Inno Setup 6：
+
+```powershell
+cd jntool
+.\installer\windows\build_windows_installer.ps1
+```
+
+安装包输出到：`jntool\dist\windows\JNToolSetup-1.0.0.exe`
+
+也可以使用 GitHub Actions 云端 Windows 环境打包：打开 `Build Windows Installer` 工作流，点击 `Run workflow`，完成后在 Artifacts 中下载 `JNToolSetup-1.0.0`。
+
 macOS：
 
 ```bash

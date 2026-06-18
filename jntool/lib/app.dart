@@ -57,6 +57,14 @@ class JNToolApp extends StatelessWidget {
           description: 'Spring Boot YAML 与 properties 互相转换',
           route: '/tools/config',
         ));
+        provider.registerTool(const ToolModel(
+          id: 'base64_tool',
+          name: 'Base64 转换',
+          icon: '🔐',
+          color: '#EC4899',
+          description: '文本 / 图片 与 Base64 互相转换',
+          route: '/tools/base64',
+        ));
         return provider;
       },
       child: MaterialApp(

@@ -57,6 +57,14 @@ flutter analyze
 flutter build windows
 ```
 
+构建 Windows 安装包需在 Windows 主机执行，并安装 Inno Setup 6：
+
+```powershell
+.\installer\windows\build_windows_installer.ps1
+```
+
+安装包输出到：`dist\windows\JNToolSetup-1.0.0.exe`
+
 构建 macOS 应用：
 
 ```bash

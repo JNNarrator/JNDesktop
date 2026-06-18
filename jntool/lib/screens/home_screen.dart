@@ -9,6 +9,7 @@ import '../tools/curl_tool/curl_tool_screen.dart';
 import '../tools/bean_tool/bean_tool_screen.dart';
 import '../tools/cron_tool/cron_tool_screen.dart';
 import '../tools/config_tool/config_tool_screen.dart';
+import '../tools/base64_tool/base64_tool_screen.dart';
 import '../utils/constants.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/glass_container.dart';
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'bean_tool',
     'cron_tool',
     'config_tool',
+    'base64_tool',
   ];
 
   // 预创建所有工具页面实例（保持状态）
@@ -42,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       BeanToolScreen(),
       CronToolScreen(),
       ConfigToolScreen(),
+      Base64ToolScreen(),
     ];
   }
 
