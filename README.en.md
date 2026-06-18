@@ -4,9 +4,12 @@ JNTool is a Flutter-based desktop toolkit for everyday developer workflows such 
 
 ## Features
 
-- **JSON / Java Bean conversion**: Generate Java Bean code from JSON, or produce sample JSON from Java Bean fields. Supports class name, package name, Lombok annotations, Jackson annotations, camelCase conversion, and field comments.
-- **Curl tool**: Parse curl commands and extract URL, method, headers, and request body for API debugging.
-- **JSON tool**: Format, minify, and inspect JSON structures.
+- **JSON tool**: Format, minify, validate, and inspect JSON structures in a tree view.
+- **Curl request tool**: Parse curl commands, extract URL, method, headers, and body, then send HTTP requests for API debugging.
+- **Bean conversion**: Generate Java Bean code from JSON, or produce sample JSON from Java Bean fields. Supports class name, package name, Lombok annotations, Jackson annotations, camelCase conversion, and field comments.
+- **Cron generator**: Create Spring Boot cron expressions and preview upcoming execution times.
+- **Config conversion**: Convert Spring Boot YAML and properties files in both directions while preserving edge cases such as empty string values.
+- **Base64 conversion**: Convert text / images to and from Base64 for quick encoding checks.
 - **Desktop experience**: Built with Flutter and includes Windows and macOS platform projects.
 
 ## Tech Stack
@@ -53,6 +56,17 @@ Windows:
 flutter build windows
 ```
 
+To generate the Windows installer, run the script on a Windows host with Inno Setup 6 installed:
+
+```powershell
+cd jntool
+.\installer\windows\build_windows_installer.ps1
+```
+
+The installer is written to `jntool\dist\windows\JNToolSetup-1.0.0.exe`.
+
+You can also build it in GitHub Actions: open the `Build Windows Installer` workflow, click `Run workflow`, and download the `JNToolSetup-1.0.0` artifact after the workflow finishes.
+
 macOS:
 
 ```bash
@@ -71,7 +85,10 @@ jndesktop/
 │   │   ├── providers/
 │   │   ├── screens/
 │   │   ├── tools/
+│   │   │   ├── base64_tool/
 │   │   │   ├── bean_tool/
+│   │   │   ├── config_tool/
+│   │   │   ├── cron_tool/
 │   │   │   ├── curl_tool/
 │   │   │   └── json_tool/
 │   │   ├── utils/
