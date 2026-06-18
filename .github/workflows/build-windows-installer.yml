@@ -23,7 +23,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          cache: true
+          # 关闭 Action 缓存，避免云端缓存恢复/解压卡住导致安装包无法继续构建。
+          cache: false
 
       - name: Enable Windows desktop
         run: flutter config --enable-windows-desktop
