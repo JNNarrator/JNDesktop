@@ -41,6 +41,22 @@ class JNToolApp extends StatelessWidget {
           description: 'JSON ↔ Java Bean 互相转换',
           route: '/tools/bean',
         ));
+        provider.registerTool(const ToolModel(
+          id: 'cron_tool',
+          name: 'Cron 生成',
+          icon: '⏰',
+          color: '#6366F1',
+          description: 'Spring Boot cron 生成与执行时间预览',
+          route: '/tools/cron',
+        ));
+        provider.registerTool(const ToolModel(
+          id: 'config_tool',
+          name: '配置转换',
+          icon: '⚙️',
+          color: '#0EA5E9',
+          description: 'Spring Boot YAML 与 properties 互相转换',
+          route: '/tools/config',
+        ));
         return provider;
       },
       child: MaterialApp(
@@ -95,8 +111,12 @@ class _AppBackground extends StatelessWidget {
           stops: [0.0, 0.3, 0.6, 1.0],
         ),
       ),
-      child: SafeArea(
-        child: child,
+      child: Material(
+        // 为各工具页中的 TextField、InkWell 等 Material 组件提供透明承载层。
+        type: MaterialType.transparency,
+        child: SafeArea(
+          child: child,
+        ),
       ),
     );
   }

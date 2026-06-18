@@ -7,6 +7,8 @@ import '../providers/tool_provider.dart';
 import '../tools/json_tool/json_tool_screen.dart';
 import '../tools/curl_tool/curl_tool_screen.dart';
 import '../tools/bean_tool/bean_tool_screen.dart';
+import '../tools/cron_tool/cron_tool_screen.dart';
+import '../tools/config_tool/config_tool_screen.dart';
 import '../utils/constants.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/glass_container.dart';
@@ -24,6 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
     'json_tool',
     'curl_tool',
     'bean_tool',
+    'cron_tool',
+    'config_tool',
   ];
 
   // 预创建所有工具页面实例（保持状态）
@@ -36,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
       JsonToolScreen(),
       CurlToolScreen(),
       BeanToolScreen(),
+      CronToolScreen(),
+      ConfigToolScreen(),
     ];
   }
 

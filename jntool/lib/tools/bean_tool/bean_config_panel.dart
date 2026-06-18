@@ -24,6 +24,7 @@ class BeanConfigPanel extends StatefulWidget {
 class _BeanConfigPanelState extends State<BeanConfigPanel> {
   late TextEditingController _classNameCtrl;
   late TextEditingController _packageCtrl;
+  final ScrollController _configScrollController = ScrollController();
 
   BeanConvertConfig get _base => widget.config;
 
@@ -51,6 +52,7 @@ class _BeanConfigPanelState extends State<BeanConfigPanel> {
   void dispose() {
     _classNameCtrl.dispose();
     _packageCtrl.dispose();
+    _configScrollController.dispose();
     super.dispose();
   }
 
@@ -109,8 +111,10 @@ class _BeanConfigPanelState extends State<BeanConfigPanel> {
           const SizedBox(height: AppSpacing.sm),
           Expanded(
             child: Scrollbar(
+              controller: _configScrollController,
               thumbVisibility: true,
               child: SingleChildScrollView(
+                controller: _configScrollController,
                 padding: const EdgeInsets.only(right: AppSpacing.sm),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
