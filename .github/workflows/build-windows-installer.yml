@@ -38,10 +38,19 @@ jobs:
         shell: powershell
         working-directory: jntool
         run: |
+          $ErrorActionPreference = "Stop"
+          $flutterCommand = Get-Command flutter -ErrorAction Stop
+          $isccCommand = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+          Write-Host "Flutter path: $($flutterCommand.Source)"
+          if ($isccCommand) {
+            Write-Host "Inno Setup path: $($isccCommand.Source)"
+          } else {
+            Write-Host "Inno Setup is not on PATH; installer script will check the default install directories."
+          }
           # CI 使用 stable 通道重新解析依赖，避免本地 master 锁文件约束阻塞云端构建。
           Remove-Item pubspec.lock -ErrorAction SilentlyContinue
           # 核心流程：复用仓库内脚本，确保本地 Windows 与 CI 的打包逻辑一致。
-          .\installer\windows\build_windows_installer.ps1
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\installer\windows\build_windows_installer.ps1
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4

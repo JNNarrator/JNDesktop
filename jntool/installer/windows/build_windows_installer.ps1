@@ -34,10 +34,15 @@ function Resolve-InnoSetupCompiler {
     return $command.Source
   }
 
-  $candidatePaths = @(
-    (Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"),
-    (Join-Path $env:ProgramFiles "Inno Setup 6\ISCC.exe")
-  )
+  $candidateRoots = @(
+    ${env:ProgramFiles(x86)},
+    $env:ProgramFiles
+  ) | Where-Object { $_ }
+
+  # 核心兼容：CI 环境不一定会把 ISCC.exe 写入 PATH，因此额外检查默认安装目录。
+  $candidatePaths = foreach ($candidateRoot in $candidateRoots) {
+    Join-Path $candidateRoot "Inno Setup 6\ISCC.exe"
+  }
 
   foreach ($candidatePath in $candidatePaths) {
     if ($candidatePath -and (Test-Path $candidatePath)) {
