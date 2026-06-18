@@ -70,5 +70,44 @@ app:
       expect(properties, contains('app.servers[1].host=example.com'));
       expect(properties, contains('app.servers[1].port=9090'));
     });
+    test('yamlToProperties preserves input order', () {
+      final properties = ConfigConverter.yamlToProperties('''
+spring:
+  application:
+    name: demo-service
+  datasource:
+    url: 'jdbc:mysql://localhost:3306/demo'
+    username: root
+    password: 123456
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+app:
+  servers:
+    - host: localhost
+      port: 8081
+    - host: example.com
+      port: 8082
+''');
+
+      expect(
+        properties,
+        equals('''
+spring.application.name=demo-service
+spring.datasource.url=jdbc:mysql://localhost:3306/demo
+spring.datasource.username=root
+spring.datasource.password=123456
+server.port=8080
+management.endpoints.web.exposure.include=health,info
+app.servers[0].host=localhost
+app.servers[0].port=8081
+app.servers[1].host=example.com
+app.servers[1].port=8082'''),
+      );
+    });
   });
 }

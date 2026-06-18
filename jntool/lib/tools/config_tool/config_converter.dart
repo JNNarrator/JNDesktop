@@ -248,8 +248,7 @@ class ConfigConverter {
   }
 
   static String _renderProperties(Map<String, String> values) {
-    final keys = values.keys.toList()..sort();
-    return keys.map((key) => '$key=${values[key]}').join('\n');
+    return values.entries.map((entry) => '${entry.key}=${entry.value}').join('\n');
   }
 
   static _YamlEntry? _splitYamlEntry(String line) {
