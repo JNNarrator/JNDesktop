@@ -10,6 +10,7 @@ JNTool is a Flutter-based desktop toolkit for everyday developer workflows such 
 - **Cron generator**: Create Spring Boot cron expressions and preview upcoming execution times.
 - **Config conversion**: Convert Spring Boot YAML and properties files in both directions while preserving edge cases such as empty string values.
 - **Base64 conversion**: Convert text / images to and from Base64 for quick encoding checks.
+- **WebDAV manager**: Save WebDAV connections locally, test connectivity, browse remote directories, upload/download files, create folders, delete resources, and edit UTF-8 text files in place.
 - **Desktop experience**: Built with Flutter and includes Windows and macOS platform projects.
 
 ## Tech Stack
@@ -90,7 +91,8 @@ jndesktop/
 │   │   │   ├── config_tool/
 │   │   │   ├── cron_tool/
 │   │   │   ├── curl_tool/
-│   │   │   └── json_tool/
+│   │   │   ├── json_tool/
+│   │   │   └── webdav_tool/
 │   │   ├── utils/
 │   │   └── widgets/
 │   ├── macos/

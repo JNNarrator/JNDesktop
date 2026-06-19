@@ -6,3 +6,6 @@
 **/.dart_tool/
 **/.flutter-plugins
 **/.flutter-plugins-dependencies
+
+# superpowers 可视化草图本地缓存
+.superpowers/

@@ -9,6 +9,7 @@
 - `lib/tools/bean_tool/`：JSON 与 Java Bean 双向转换工具。
 - `lib/tools/curl_tool/`：curl 命令解析工具。
 - `lib/tools/json_tool/`：JSON 格式化与查看工具。
+- `lib/tools/webdav_tool/`：WebDAV 连接保存、连接测试、目录浏览、文件上传下载和文本编辑保存工具。
 - `lib/widgets/`：侧边栏、工具卡片、玻璃容器等通用组件。
 - `lib/utils/constants.dart`：颜色、间距、字体和阴影等设计常量。
 
@@ -79,6 +80,16 @@ JavaBean 工具支持两种方向：
 - Java Bean 转 JSON：从 `private Type name;` 字段声明中提取字段，并生成示例 JSON。
 
 该工具偏向轻量代码生成，不替代完整的 Java AST 解析器。复杂泛型、继承层级和注解语义目前不作为解析目标。
+
+## WebDAV 管理工具
+
+WebDAV 管理工具采用三栏桌面管理台：
+
+- 左侧保存 WebDAV 连接信息到本地 `.jntool/webdav_connections.json`，并支持连接测试。
+- 中间浏览远端目录，支持刷新、返回上级、新建文件夹、上传文件。
+- 右侧查看文件详情，支持下载、删除资源，并可打开 UTF-8 文本文件后编辑保存。
+
+连接信息当前只做本地持久化，不包含云同步或密码加密能力；请在可信设备上使用。
 
 ## 提交前检查
 

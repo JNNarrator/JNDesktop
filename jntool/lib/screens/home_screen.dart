@@ -10,6 +10,7 @@ import '../tools/bean_tool/bean_tool_screen.dart';
 import '../tools/cron_tool/cron_tool_screen.dart';
 import '../tools/config_tool/config_tool_screen.dart';
 import '../tools/base64_tool/base64_tool_screen.dart';
+import '../tools/webdav_tool/webdav_tool_screen.dart';
 import '../utils/constants.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/glass_container.dart';
@@ -30,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'cron_tool',
     'config_tool',
     'base64_tool',
+    'webdav_tool',
   ];
 
   // 预创建所有工具页面实例（保持状态）
@@ -45,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       CronToolScreen(),
       ConfigToolScreen(),
       Base64ToolScreen(),
+      WebDavToolScreen(),
     ];
   }
 

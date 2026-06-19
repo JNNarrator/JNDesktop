@@ -65,6 +65,14 @@ class JNToolApp extends StatelessWidget {
           description: '文本 / 图片 与 Base64 互相转换',
           route: '/tools/base64',
         ));
+        provider.registerTool(const ToolModel(
+          id: 'webdav_tool',
+          name: 'WebDAV 管理',
+          icon: '☁️',
+          color: '#0EA5E9',
+          description: '保存连接、测试连接、浏览与编辑 WebDAV 文件',
+          route: '/tools/webdav',
+        ));
         return provider;
       },
       child: MaterialApp(
